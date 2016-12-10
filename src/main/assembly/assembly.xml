@@ -7,7 +7,7 @@
   <fileSets>
     <fileSet>
       <directory>src/main/bin</directory>
-      <outputDirectory>/bin</outputDirectory>
+      <outputDirectory>bin</outputDirectory>
       <includes>
         <include>load.sh</include>
         <include>phonex.sh</include>
@@ -15,17 +15,23 @@
     </fileSet>
     <fileSet>
       <directory>src/main/resources</directory>
-      <outputDirectory>/conf</outputDirectory>
+      <outputDirectory>conf</outputDirectory>
       <includes>
         <include>phonex.properties</include>
       </includes>
     </fileSet>
     <fileSet>
       <directory>src/main/scripts</directory>
-      <outputDirectory>/scripts</outputDirectory>
+      <outputDirectory>scripts</outputDirectory>
       <includes>
         <include>phonex</include>
       </includes>
     </fileSet>
   </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <scope>runtime</scope>
+      <outputDirectory>lib</outputDirectory>
+    </dependencySet>
+  </dependencySets>
 </assembly>
