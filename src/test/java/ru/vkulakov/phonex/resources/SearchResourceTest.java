@@ -34,8 +34,9 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void testGetIt() {
-        String responseMsg = target.path("search").request().get(String.class);
-        assertEquals("Phone found", responseMsg);
+    public void testSearch() {
+        String expected = "Phone found";
+        String actual = target.path("search").request().get(String.class);
+        assertEquals("Полученный ответ не соответствует ожидаемому", expected, actual);
     }
 }

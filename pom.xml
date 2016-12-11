@@ -55,16 +55,21 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
-				<configuration>
-					<excludes>
-						<exclude>**/phonex.properties</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>ru.vkulakov.phonex.Main</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -95,21 +100,6 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
-		                <groupId>org.codehaus.mojo</groupId>
-		                <artifactId>exec-maven-plugin</artifactId>
-		                <version>1.2.1</version>
-		                <executions>
-		                    <execution>
-		                        <goals>
-		                            <goal>java</goal>
-		                        </goals>
-		                    </execution>
-		                </executions>
-		                <configuration>
-		                    <mainClass>ru.vkulakov.phonex.Main</mainClass>
-		                </configuration>
-		            </plugin>
 		        </plugins>
 		    </build>
 		</profile>
@@ -140,21 +130,6 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
-		                <groupId>org.codehaus.mojo</groupId>
-		                <artifactId>exec-maven-plugin</artifactId>
-		                <version>1.2.1</version>
-		                <executions>
-		                    <execution>
-		                        <goals>
-		                            <goal>java</goal>
-		                        </goals>
-		                    </execution>
-		                </executions>
-		                <configuration>
-		                    <mainClass>ru.vkulakov.phonex.Main</mainClass>
-		                </configuration>
-		            </plugin>
 		        </plugins>
 		    </build>
 		</profile>
