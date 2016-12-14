@@ -1,0 +1,6 @@
+.idea/
+conf/phonex.properties
+data/phonex.db
+target/
+phonex.iml
+phonex.production.properties
