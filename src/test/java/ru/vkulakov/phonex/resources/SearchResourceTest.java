@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.vkulakov.phonex.Main;
+import ru.vkulakov.phonex.PhonexPropertiesWrap;
+import ru.vkulakov.phonex.utils.Setup;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,18 +27,19 @@ public class SearchResourceTest {
 
         Client c = ClientBuilder.newClient();
 
-        target = c.target(Main.BASE_URI);
+        target = c.target(Setup.makeBaseUri());
     }
 
     @After
     public void tearDown() throws Exception {
         Main.shutdownServer();
+		PhonexPropertiesWrap.recycle();
     }
 
     @Test
-    public void testSearch() {
+    public void testSearchNormal() {
         String expected = "Phone found";
-        String actual = target.path("search").request().get(String.class);
-        assertEquals("Полученный ответ не соответствует ожидаемому", expected, actual);
+        String actual = target.path("search/79515639692").request().get(String.class);
+        assertEquals(expected, actual);
     }
 }

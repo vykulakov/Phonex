@@ -31,11 +31,33 @@ public class PhonexProperties {
 		this.properties = properties;
 	}
 
+	/**
+	 * <p>Получение значения параметра по его имени.</p>
+	 * <p>Если параметр не найден, то выбрасывается {@link PropertiesException}.</p>
+	 * @param name имя параметра.
+	 * @return Значение параметра.
+	 * @throws PropertiesException если параметр с указанным именем в настройках не найден.
+	 */
 	public String getProperty(String name) {
 		if(properties.containsKey(name)) {
 			return properties.getProperty(name);
 		} else {
 			throw new PropertiesException("Параметр '" + name + "' не найден");
+		}
+	}
+
+	/**
+	 * <p>Получение значения параметра по его имени.</p>
+	 * <p>Если параметр не найден, то возвращается значение по-умолчанию.</p>
+	 * @param name имя параметра.
+	 * @param defValue значение по-умолчанию для параметра.
+	 * @return Значение параметра или значение по-умолчанию.
+	 */
+	public String getProperty(String name, String defValue) {
+		if(properties.containsKey(name)) {
+			return properties.getProperty(name);
+		} else {
+			return defValue;
 		}
 	}
 

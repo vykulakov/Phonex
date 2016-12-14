@@ -3,35 +3,48 @@ package ru.vkulakov.phonex;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import ru.vkulakov.phonex.exceptions.PhonexException;
+import ru.vkulakov.phonex.utils.Setup;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
- * Main class.
- *
+ * <h3>Основной класс для запуска и инициализации приложения</h3>
  */
 public class Main {
-	// Base URI the Grizzly HTTP server will listen on
-	public final static String BASE_URI = "http://localhost:8080/phonex/";
-
     private static HttpServer server;
 
 	private final static Object lock = new Object();
 
+	/**
+	 * <p>Инициализация приложения.</p>
+	 */
+	private static void init() {
+		try (
+			Connection conn = Setup.getConnection();
+		) {
+			Setup.initDatabase(conn);
+		} catch (SQLException e) {
+			throw new PhonexException("Ошибка закрытия подключения к базе данных", e);
+		}
+	}
+
     /**
-     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
+     * <p>Запуск Grizzly HTTP сервера для предоставления JAX-RS ресурсов, описанных в приложении.</p>
      */
     public static void startServer() {
         final ResourceConfig rc = new ResourceConfig().packages("ru.vkulakov.phonex.resources");
 
-        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Setup.makeBaseUri()), rc);
     }
 
     /**
-     * Shutdowns Grizzly HTTP server.
+     * <p>Остановка Grizzly HTTP сервера.</p>
      */
     public static void shutdownServer() {
         server.shutdownNow();
@@ -42,6 +55,7 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+    	init();
         startServer();
 
 		System.out.println(String.format("Рабочая директория: %s", System.getProperty("user.dir")));
