@@ -12,19 +12,24 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <h3>Основной класс для запуска и инициализации приложения</h3>
  */
 public class Main {
     private static HttpServer server;
+	private static ScheduledExecutorService executorService;
 
 	private final static Object lock = new Object();
 
 	/**
 	 * <p>Инициализация приложения.</p>
 	 */
-	private static void init() {
+	public static void init() {
 		try (
 			Connection conn = Setup.getConnection();
 		) {
@@ -50,13 +55,21 @@ public class Main {
         server.shutdownNow();
     }
 
-    /**
+
+	private static void startLoader() {
+		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
+		executorService.scheduleAtFixedRate(new Loader(), 1, 60, TimeUnit.SECONDS);
+	}
+
+	/**
      * Main method.
      * @param args
      */
     public static void main(String[] args) {
     	init();
         startServer();
+        startLoader();
 
 		System.out.println(String.format("Рабочая директория: %s", System.getProperty("user.dir")));
 		System.out.println(String.format("Текущий профиль: %s", PhonexProperties.getInstance().getProperty("profile")));

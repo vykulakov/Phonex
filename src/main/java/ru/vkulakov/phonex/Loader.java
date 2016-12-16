@@ -18,11 +18,9 @@ public class Loader implements Runnable {
 	@Override
 	public void run() {
 		RangeService rangeService = new RangeService();
-		try (
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(CODE_9kh).openStream(), "cp1251"));
-		) {
-			rangeService.load(reader);
-		} catch (IOException e) {
+		try {
+			rangeService.load(CODE_9kh);
+		} catch (Exception e) {
 			System.err.println("Ошибка загрузки данных с диапазонами номеров телефонов");
 			e.printStackTrace(System.err);
 		}

@@ -19,7 +19,7 @@ public class RangeDao {
 
 	public void insert(Range range) {
 		try (
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO code_9kh SET code = ?, start = ?, finish = ?, capacity = ?, operator = ?, region = ?;");
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO code_9kh (code, start, finish, capacity, operator, region) VALUES (?, ?, ?, ?, ?, ?);");
 		) {
 			int index = 1;
 			ps.setInt(index++, range.getCode());
@@ -32,6 +32,16 @@ public class RangeDao {
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new PhonexException("Ошибка добавления диапазона номеров телефонов", e);
+		}
+	}
+
+	public void truncate() {
+		try (
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM code_9kh; VACUUM;");
+		) {
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new PhonexException("Ошибка очистки таблицы с номерами телефонов", e);
 		}
 	}
 }
