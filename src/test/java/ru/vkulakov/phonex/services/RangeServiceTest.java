@@ -19,6 +19,6 @@ public class RangeServiceTest {
 
 	@Test
 	public void load() {
-		new RangeService().load("https://www.rossvyaz.ru/docs/articles/Kody_DEF-9kh.csv");
+		new RangeService().load("code_9kh", "file:///" + System.getProperty("user.dir") + "/src/test/java/ru/vkulakov/phonex/services/RangeServiceTest.csv");
 	}
 }

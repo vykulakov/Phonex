@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 
 /**
  * <h3>Класс для получения доступа к ресурсам приложения</h3>
@@ -31,15 +32,18 @@ public class Setup {
 	}
 
 	/**
-	 * <p>Инициализации базы данных.</p>
-	 * <p>Создаёт необходимые для работы таблицы в базе данных.</p>
+	 * Инициализации базы данных.
+	 * Создаёт необходимые для работы таблицы в базе данных.
 	 * @param conn подключение к базе данных.
 	 */
 	public static void initDatabase(Connection conn) {
 		try {
 			Statement stmt = conn.createStatement();
 
-			stmt.executeUpdate("CREATE TABLE IF NOT EXISTS code_9kh (code INTEGER, start INTEGER, finish INTEGER, capacity INTEGER, operator STRING, region STRING)");
+			Map<String, String> codes = PhonexProperties.getInstance().getPropertyByPrefix("rossvyaz.");
+			for(String table : codes.keySet()) {
+				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + table + " (code INTEGER, start INTEGER, finish INTEGER, capacity INTEGER, operator STRING, region STRING)");
+			}
 		} catch (SQLException e) {
 			throw new PhonexException("Ошибка инициализации базы данных", e);
 		}

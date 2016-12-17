@@ -6,19 +6,15 @@ import org.glassfish.jersey.server.ResourceConfig;
 import ru.vkulakov.phonex.exceptions.PhonexException;
 import ru.vkulakov.phonex.utils.Setup;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <h3>Основной класс для запуска и инициализации приложения</h3>
+ * Основной класс для запуска и инициализации приложения.
  */
 public class Main {
     private static HttpServer server;
@@ -30,6 +26,8 @@ public class Main {
 	 * <p>Инициализация приложения.</p>
 	 */
 	public static void init() {
+		System.out.println("Инициализация приложения");
+
 		try (
 			Connection conn = Setup.getConnection();
 		) {
@@ -43,6 +41,8 @@ public class Main {
      * <p>Запуск Grizzly HTTP сервера для предоставления JAX-RS ресурсов, описанных в приложении.</p>
      */
     public static void startServer() {
+		System.out.println("Запуск Grizzly HTTP сервера");
+
         final ResourceConfig rc = new ResourceConfig().packages("ru.vkulakov.phonex.resources");
 
         server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Setup.makeBaseUri()), rc);
@@ -52,18 +52,32 @@ public class Main {
      * <p>Остановка Grizzly HTTP сервера.</p>
      */
     public static void shutdownServer() {
+		System.out.println("Остановка Grizzly HTTP сервера");
+
         server.shutdownNow();
     }
 
-
+	/**
+	 * Запуск планировщика для переодического обновления базы номером телефонов.
+	 */
 	private static void startLoader() {
-		ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+		System.out.println("Запуск загрузчика");
 
-		executorService.scheduleAtFixedRate(new Loader(), 1, 60, TimeUnit.SECONDS);
+		executorService = Executors.newScheduledThreadPool(1);
+		executorService.scheduleAtFixedRate(new Loader(), 10, 60, TimeUnit.SECONDS);
 	}
 
 	/**
-     * Main method.
+	 * Остановка планировщика.
+	 */
+	private static void shutdownLoader() {
+		System.out.println("Остановка загрузчика");
+
+		executorService.shutdownNow();
+	}
+
+	/**
+     * Главный метод для запуска приложения.
      * @param args
      */
     public static void main(String[] args) {
@@ -77,6 +91,7 @@ public class Main {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			System.out.println("Получен сигнал завершения приложения");
 
+			shutdownLoader();
 			shutdownServer();
 			synchronized (lock) {
 				lock.notifyAll();
@@ -86,10 +101,13 @@ public class Main {
         synchronized (lock) {
             try {
                 lock.wait();
+				System.out.println("Завершение ожидания");
             } catch (InterruptedException e) {
                 System.err.println("Ошибка ожидания завершения приложения");
                 e.printStackTrace(System.err);
             }
         }
+
+		System.out.println("Остановка приложения");
     }
 }

@@ -1,11 +1,15 @@
 package ru.vkulakov.phonex;
 
+import oracle.jrockit.jfr.StringConstantPool;
 import ru.vkulakov.phonex.exceptions.PhonexException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -54,11 +58,25 @@ public class PhonexProperties {
 	 * @return Значение параметра или значение по-умолчанию.
 	 */
 	public String getProperty(String name, String defValue) {
-		if(properties.containsKey(name)) {
-			return properties.getProperty(name);
-		} else {
-			return defValue;
+		return properties.getProperty(name, defValue);
+	}
+
+	/**
+	 * Получение карты значений по префиксу имени
+	 * @param prefix префикс имени параметра.
+	 * @return Карта значений, где ключ - имя параметра без префикса, значение - значение параметра.
+	 */
+	public Map<String, String> getPropertyByPrefix(String prefix) {
+		Map<String, String> result = new HashMap<String, String>();
+
+		Enumeration<String> names = (Enumeration<String>) properties.propertyNames();
+		while(names.hasMoreElements()) {
+			String name = names.nextElement();
+			if(name.startsWith(prefix)) {
+				result.put(name.replaceFirst(prefix, ""), properties.getProperty(name));
+			}
 		}
+		return result;
 	}
 
 	public static synchronized PhonexProperties getInstance() {
