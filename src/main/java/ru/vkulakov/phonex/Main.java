@@ -9,9 +9,7 @@ import ru.vkulakov.phonex.utils.Setup;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Основной класс для запуска и инициализации приложения.
@@ -74,6 +72,16 @@ public class Main {
 		System.out.println("Остановка загрузчика");
 
 		executorService.shutdownNow();
+
+		while(!executorService.isTerminated()) {
+			System.out.println("Загрузчик всё ещё запущен.");
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				System.out.println("Ошибка ожидания остановки загрузчика");
+				e.printStackTrace(System.err);
+			}
+		}
 	}
 
 	/**
@@ -93,14 +101,26 @@ public class Main {
 
 			shutdownLoader();
 			shutdownServer();
+
 			synchronized (lock) {
 				lock.notifyAll();
+
+				try {
+					System.out.println("Ожидание перед завершением приложения");
+
+					Thread.sleep(5000);
+
+					System.out.println("Конец ожидания перед завершением приложения");
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}));
 
         synchronized (lock) {
             try {
                 lock.wait();
+
 				System.out.println("Завершение ожидания");
             } catch (InterruptedException e) {
                 System.err.println("Ошибка ожидания завершения приложения");

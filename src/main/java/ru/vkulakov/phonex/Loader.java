@@ -16,6 +16,11 @@ public class Loader implements Runnable {
 		try {
 			Map<String, String> codes = PhonexProperties.getInstance().getPropertyByPrefix("rossvyaz.");
 			for(Map.Entry<String, String> code : codes.entrySet()) {
+				if(Thread.currentThread().isInterrupted()) {
+					System.out.println("Выполнение загрузки номеров телефонов прервано");
+					break;
+				}
+
 				rangeService.load(code.getKey(), code.getValue());
 			}
 		} catch (Exception e) {

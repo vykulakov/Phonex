@@ -48,6 +48,12 @@ public class RangeService {
 			long start = System.currentTimeMillis();
 			Range range = new Range();
 			for(CSVRecord record : parser) {
+				if(Thread.currentThread().isInterrupted()) {
+					System.out.println("Парсинг номеров телефонов прерван");
+					conn.commit();
+					break;
+				}
+
 				range.setCode(Integer.valueOf(record.get(0)));
 				range.setStart(Integer.valueOf(record.get(1)));
 				range.setFinish(Integer.valueOf(record.get(2)));
@@ -58,7 +64,9 @@ public class RangeService {
 				rangeDao.insert(table, range);
 
 				// Делаем коммит после каждой тысячной записи.
-				if(++i % 1000 == 0) {
+				// Сначала увеличиваем на единицу, а потом проверяем на тысячу.
+				if(++i % 5000 == 0) {
+					System.out.println(String.format("Commit [i=%d, table=%s]", i, table));
 					conn.commit();
 				}
 			}
