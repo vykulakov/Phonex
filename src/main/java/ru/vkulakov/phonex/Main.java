@@ -41,9 +41,9 @@ public class Main {
     public static void startServer() {
 		System.out.println("Запуск Grizzly HTTP сервера");
 
-        final ResourceConfig rc = new ResourceConfig().packages("ru.vkulakov.phonex.resources");
+        ResourceConfig resourceConfig = new ResourceConfig().packages("ru.vkulakov.phonex.resources");
 
-        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Setup.makeBaseUri()), rc);
+        server = GrizzlyHttpServerFactory.createHttpServer(URI.create(Setup.makeBaseUri()), resourceConfig);
     }
 
     /**
@@ -71,17 +71,20 @@ public class Main {
 	private static void shutdownLoader() {
 		System.out.println("Остановка загрузчика");
 
-		executorService.shutdownNow();
+		try {
+			// Отменяем запущенные операции.
+			executorService.shutdownNow();
 
-		while(!executorService.isTerminated()) {
-			System.out.println("Загрузчик всё ещё запущен.");
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				System.out.println("Ошибка ожидания остановки загрузчика");
-				e.printStackTrace(System.err);
+			// Ждём завершения запущенных задач.
+			if(!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+				System.err.println("Истекло время ожидания остановки загрузчика");
 			}
+		} catch (InterruptedException e) {
+			System.err.println("Ошибка ожидания остановки загрузчика");
+			e.printStackTrace(System.err);
 		}
+
+		System.out.println("Окончание остановки загрузчика");
 	}
 
 	/**

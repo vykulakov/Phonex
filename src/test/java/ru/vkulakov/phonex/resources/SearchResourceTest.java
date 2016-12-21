@@ -36,10 +36,31 @@ public class SearchResourceTest {
 		PhonexPropertiesWrap.recycle();
     }
 
+	@Test
+	public void testSearchEmpty() {
+		String expected = "{\"message\":\"Номер телефона не передан\",\"result\":1}";
+		String actual = target.path("search/ ").request().get(String.class);
+		assertEquals(expected, actual);
+	}
+
     @Test
     public void testSearchNormal() {
-        String expected = "Phone found";
+        String expected = "{\"message\":\"\",\"phone\":{\"operator\":\"ООО \\\"Т2 Мобайл\\\"\",\"phone\":\"79515639692\",\"region\":\"Воронежская обл.\"},\"result\":0}";
         String actual = target.path("search/79515639692").request().get(String.class);
         assertEquals(expected, actual);
     }
+
+	@Test
+	public void testSearchNotFound() {
+		String expected = "{\"message\":\"Информация по номеру телефона не найдена\",\"result\":3}";
+		String actual = target.path("search/70123456789").request().get(String.class);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testSearchBadFormat() {
+		String expected = "{\"message\":\"Передан некорректный номер телефона\",\"result\":2}";
+		String actual = target.path("search/7012345678X").request().get(String.class);
+		assertEquals(expected, actual);
+	}
 }
