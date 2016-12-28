@@ -50,13 +50,13 @@ public class Range {
 
 	@Override
 	public String toString() {
-		return "Range [" +
+		return "Range {" +
 				"code=" + code +
 				", start=" + start +
 				", finish=" + finish +
 				", capacity=" + capacity +
 				", operator='" + operator + '\'' +
 				", region='" + region + '\'' +
-				']';
+				'}';
 	}
 }

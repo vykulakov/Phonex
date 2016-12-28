@@ -1,4 +1,4 @@
-package ru.vkulakov.phonex;
+package ru.vkulakov.phonex.utils;
 
 /**
  * <h3>Обёртка для класса параметров приложения для удобного тестирования</h3>

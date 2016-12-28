@@ -3,43 +3,61 @@ package ru.vkulakov.phonex;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import ru.vkulakov.phonex.exceptions.PhonexException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.vkulakov.phonex.utils.PhonexProperties;
 import ru.vkulakov.phonex.utils.Setup;
 
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Основной класс для запуска и инициализации приложения.
  */
 public class Main {
+	/**
+	 * Grizzly HTTP сервер
+	 */
     private static HttpServer server;
-	private static ScheduledExecutorService executorService;
-
-	private final static Object lock = new Object();
 
 	/**
-	 * <p>Инициализация приложения.</p>
+	 * Планировщик заданий для загрузки данных в базу.
+	 */
+	private static ScheduledExecutorService executorService;
+
+	/**
+	 * Объект для корректного завершения приложения
+	 */
+	private final static CountDownLatch latch = new CountDownLatch(1);
+
+	private final static Logger logger = LoggerFactory.getLogger(Main.class);
+
+	/**
+	 * Инициализация приложения.
+	 * Создаёт базу данных и необходимые для работы приложения таблицы в базе.
 	 */
 	public static void init() {
-		System.out.println("Инициализация приложения");
+		logger.debug("Инициализация приложения");
 
 		try (
-			Connection conn = Setup.getConnection();
+			Connection conn = Setup.getConnection()
 		) {
 			Setup.initDatabase(conn);
 		} catch (SQLException e) {
-			throw new PhonexException("Ошибка закрытия подключения к базе данных", e);
+			logger.warn("Ошибка закрытия подключения к базе данных", e);
 		}
 	}
 
     /**
-     * <p>Запуск Grizzly HTTP сервера для предоставления JAX-RS ресурсов, описанных в приложении.</p>
+     * Запуск Grizzly HTTP сервера.
      */
     public static void startServer() {
-		System.out.println("Запуск Grizzly HTTP сервера");
+		logger.debug("Запуск Grizzly HTTP сервера");
 
         ResourceConfig resourceConfig = new ResourceConfig().packages("ru.vkulakov.phonex.resources");
 
@@ -47,29 +65,29 @@ public class Main {
     }
 
     /**
-     * <p>Остановка Grizzly HTTP сервера.</p>
+     * Остановка Grizzly HTTP сервера.
      */
     public static void shutdownServer() {
-		System.out.println("Остановка Grizzly HTTP сервера");
+		logger.debug("Остановка Grizzly HTTP сервера");
 
         server.shutdownNow();
     }
 
 	/**
-	 * Запуск планировщика для переодического обновления базы номером телефонов.
+	 * Инициализация планировщика и запуск задачи переодического обновления базы номеров телефонов.
 	 */
 	private static void startLoader() {
-		System.out.println("Запуск загрузчика");
+		logger.debug("Запуск загрузчика");
 
 		executorService = Executors.newScheduledThreadPool(1);
-		executorService.scheduleAtFixedRate(new Loader(), 10, 60, TimeUnit.SECONDS);
+		executorService.scheduleAtFixedRate(new Loader(), 10, PhonexProperties.getInstance().getIntProperty("loader.interval"), TimeUnit.SECONDS);
 	}
 
 	/**
-	 * Остановка планировщика.
+	 * Остановка планировщика и задачи периодического обновления базы номеров телефонов.
 	 */
 	private static void shutdownLoader() {
-		System.out.println("Остановка загрузчика");
+		logger.debug("Остановка загрузчика");
 
 		try {
 			// Отменяем запущенные операции.
@@ -77,60 +95,54 @@ public class Main {
 
 			// Ждём завершения запущенных задач.
 			if(!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-				System.err.println("Истекло время ожидания остановки загрузчика");
+				logger.error("Истекло время ожидания остановки загрузчика");
 			}
 		} catch (InterruptedException e) {
-			System.err.println("Ошибка ожидания остановки загрузчика");
-			e.printStackTrace(System.err);
+			logger.error("Ошибка ожидания остановки загрузчика", e);
 		}
 
-		System.out.println("Окончание остановки загрузчика");
+		logger.debug("Окончание остановки загрузчика");
 	}
 
 	/**
      * Главный метод для запуска приложения.
-     * @param args
+     * @param args аргументы командной строки.
      */
     public static void main(String[] args) {
     	init();
         startServer();
         startLoader();
 
-		System.out.println(String.format("Рабочая директория: %s", System.getProperty("user.dir")));
-		System.out.println(String.format("Текущий профиль: %s", PhonexProperties.getInstance().getProperty("profile")));
+		logger.debug("Текущий профиль:    {}", PhonexProperties.getInstance().getProperty("profile"));
+		logger.debug("Рабочая директория: {}", System.getProperty("user.dir"));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			System.out.println("Получен сигнал завершения приложения");
+			logger.debug("Получен сигнал завершения приложения");
 
 			shutdownLoader();
 			shutdownServer();
 
-			synchronized (lock) {
-				lock.notifyAll();
+			latch.countDown();
 
-				try {
-					System.out.println("Ожидание перед завершением приложения");
+			try {
+				logger.debug("Ожидание перед завершением приложения");
 
-					Thread.sleep(5000);
+				Thread.sleep(5000);
 
-					System.out.println("Конец ожидания перед завершением приложения");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				logger.debug("Конец ожидания перед завершением приложения");
+			} catch (InterruptedException e) {
+				logger.error("Ожидание перед завершением приложения прервано", e);
 			}
 		}));
 
-        synchronized (lock) {
-            try {
-                lock.wait();
+		try {
+			latch.await();
 
-				System.out.println("Завершение ожидания");
-            } catch (InterruptedException e) {
-                System.err.println("Ошибка ожидания завершения приложения");
-                e.printStackTrace(System.err);
-            }
-        }
+			logger.debug("Завершение ожидания");
+		} catch (InterruptedException e) {
+			logger.error("Ожидание завершения приложения прервано", e);
+		}
 
-		System.out.println("Остановка приложения");
+		logger.debug("Завершение приложения");
     }
 }

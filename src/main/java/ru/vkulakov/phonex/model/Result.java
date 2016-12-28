@@ -26,7 +26,7 @@ public class Result {
 	/**
 	 * Внутрення ошибка.
 	 */
-	public static final int ERROR = 99;
+	public final static int ERROR = 99;
 
 	public Result() {
 	}
@@ -57,5 +57,14 @@ public class Result {
 	}
 	public void setPhone(Phone phone) {
 		this.phone = phone;
+	}
+
+	@Override
+	public String toString() {
+		return "Result {" +
+				"result=" + result +
+				", message='" + message + '\'' +
+				", phone=" + phone +
+				'}';
 	}
 }

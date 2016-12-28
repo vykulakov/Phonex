@@ -1,7 +1,7 @@
 package ru.vkulakov.phonex.utils;
 
-import ru.vkulakov.phonex.PhonexProperties;
 import ru.vkulakov.phonex.exceptions.PhonexException;
+import ru.vkulakov.phonex.exceptions.PropertiesException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,18 +10,20 @@ import java.sql.Statement;
 import java.util.Map;
 
 /**
- * <h3>Класс для получения доступа к ресурсам приложения</h3>
+ * Класс для получения доступа к ресурсам приложения
  */
 public class Setup {
 	/**
-	 * <p>Получение подключения к базе данных.</p>
+	 * Получение подключения к базе данных.
 	 * @return Подключение к базе данных.
 	 */
 	public static Connection getConnection() {
 		Connection connection;
 		try {
-			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:data/phonex.db");
+			Class.forName(PhonexProperties.getInstance().getProperty("db.driver"));
+			connection = DriverManager.getConnection(PhonexProperties.getInstance().getProperty("db.url"));
+		} catch (PropertiesException e) {
+			throw new PhonexException("Ошибка получения параметров для подключения к базе данных", e);
 		} catch (ClassNotFoundException e) {
 			throw new PhonexException("Драйвер для подключения к базе данных не найден", e);
 		} catch (SQLException e) {
@@ -50,9 +52,9 @@ public class Setup {
 	}
 
 	/**
-	 * <p>Формирование базового адреса сервера.</p>
-	 * <p>Получает параметры приложения и из них составляет базовый адрес,
-	 * который будет слушать сервер.</p>
+	 * Формирование базового адреса сервера.
+	 * Получает параметры приложения и из них составляет базовый адрес,
+	 * который будет слушать сервер.
 	 * @return Базовый адрес сервера.
 	 */
 	public static String makeBaseUri() {
@@ -67,13 +69,13 @@ public class Setup {
 			path = path + "/";
 		}
 
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("http://");
-		stringBuilder.append(host);
-		stringBuilder.append(":");
-		stringBuilder.append(port);
-		stringBuilder.append(path);
+		String result = "";
+		result += "http://";
+		result += host;
+		result += ":";
+		result += port;
+		result += path;
 
-		return stringBuilder.toString();
+		return result;
 	}
 }

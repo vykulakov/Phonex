@@ -3,6 +3,8 @@ package ru.vkulakov.phonex.services;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.vkulakov.phonex.dao.RangeDao;
 import ru.vkulakov.phonex.exceptions.PhonexException;
 import ru.vkulakov.phonex.model.Range;
@@ -15,9 +17,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Сервис для работы с диапазонами номеров телефонов.
+ * Сервис для работы с информацией о диапазонах номеров телефонов.
  */
 public class RangeService {
+	private final static Logger logger = LoggerFactory.getLogger(RangeService.class);
+
+	/**
+	 * Формат CSV-файла для парсинга.
+	 */
 	private final static CSVFormat format = CSVFormat.EXCEL
 			.withDelimiter(';')
 			.withFirstRecordAsHeader()
@@ -27,13 +34,13 @@ public class RangeService {
 			.withTrim();
 
 	/**
-	 * Загрузка диапазонов номеров телефонов.
-	 * @param table таблица для сохранения диапазонов,
-	 * @param url поток для чтения диапазонов.
+	 * Загрузка информации о диапазонах номеров телефонов.
+	 * @param table таблица для сохранения информации о диапазонах,
+	 * @param url URL CSV-файла для чтения информации о диапазонах.
 	 */
 	public void load(String table, String url) {
 		try (
-			Connection conn = Setup.getConnection();
+			Connection conn = Setup.getConnection()
 		) {
 			RangeDao rangeDao = new RangeDao(conn);
 
@@ -49,7 +56,7 @@ public class RangeService {
 			Range range = new Range();
 			for(CSVRecord record : parser) {
 				if(Thread.currentThread().isInterrupted()) {
-					System.out.println("Парсинг номеров телефонов прерван");
+					logger.debug("Парсинг номеров телефонов прерван");
 					conn.commit();
 					break;
 				}
@@ -63,16 +70,14 @@ public class RangeService {
 
 				rangeDao.insert(table, range);
 
-				// Делаем коммит после каждой тысячной записи.
-				// Сначала увеличиваем на единицу, а потом проверяем на тысячу.
 				if(++i % 5000 == 0) {
-					System.out.println(String.format("Commit [i=%d, table=%s]", i, table));
+					logger.debug("Commit [i={}, table={}]", i, table);
 					conn.commit();
 				}
 			}
 
 			long finish = System.currentTimeMillis();
-			System.out.println(String.format("Завершение загрузки данных в базу [time=%d, table=%s]", (finish - start), table));
+			logger.debug("Завершение загрузки данных в базу [time={}, table={}]", (finish - start), table);
 
 			conn.commit();
 

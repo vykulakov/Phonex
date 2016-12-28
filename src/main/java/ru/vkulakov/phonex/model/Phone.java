@@ -32,7 +32,7 @@ public class Phone {
 
 	@Override
 	public String toString() {
-		return "Phone{" +
+		return "Phone {" +
 				"phone='" + phone + '\'' +
 				", region='" + region + '\'' +
 				", operator='" + operator + '\'' +

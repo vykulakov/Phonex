@@ -8,10 +8,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * ДАО для работы с диапазонами номеров телефонов.
+ * ДАО для работы с информацией о диапазонах номеров телефонов.
  */
 public class RangeDao {
-	Connection conn;
+	private Connection conn;
 
 	public RangeDao(Connection conn) {
 		this.conn = conn;
@@ -19,7 +19,7 @@ public class RangeDao {
 
 	public void insert(String table, Range range) {
 		try (
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO " + table + " (code, start, finish, capacity, operator, region) VALUES (?, ?, ?, ?, ?, ?);");
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO " + table + " (code, start, finish, capacity, operator, region) VALUES (?, ?, ?, ?, ?, ?)");
 		) {
 			int index = 1;
 			ps.setInt(index++, range.getCode());
@@ -41,7 +41,7 @@ public class RangeDao {
 		) {
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			throw new PhonexException("Ошибка очистки таблицы с номерами телефонов", e);
+			throw new PhonexException("Ошибка очистки таблицы с диапазонами номеров телефонов", e);
 		}
 	}
 }

@@ -1,13 +1,12 @@
 package ru.vkulakov.phonex.utils;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Test;
-import ru.vkulakov.phonex.PhonexProperties;
-import ru.vkulakov.phonex.PhonexPropertiesWrap;
 
 import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Тестирование класса для получения доступа к ресурсам приложения.
@@ -16,6 +15,28 @@ public class SetupTest {
 	@After
 	public void tearDown() {
 		PhonexPropertiesWrap.recycle();
+	}
+
+	@Test
+	public void getConnection() {
+		Properties properties = new Properties();
+		properties.setProperty("db.driver", "org.sqlite.JDBC");
+		properties.setProperty("db.url", "jdbc:sqlite:data/phonex.test.db");
+
+		PhonexProperties.getInstance(properties);
+
+		assertNotNull(Setup.getConnection());
+	}
+
+	@Test
+	public void initDatabase() {
+		Properties properties = new Properties();
+		properties.setProperty("db.driver", "org.sqlite.JDBC");
+		properties.setProperty("db.url", "jdbc:sqlite:data/phonex.test.db");
+
+		PhonexProperties.getInstance(properties);
+
+		Setup.initDatabase(Setup.getConnection());
 	}
 
 	@Test

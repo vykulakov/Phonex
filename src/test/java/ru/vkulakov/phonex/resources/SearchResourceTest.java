@@ -1,18 +1,17 @@
 package ru.vkulakov.phonex.resources;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
 import org.glassfish.grizzly.http.server.HttpServer;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import ru.vkulakov.phonex.Main;
-import ru.vkulakov.phonex.PhonexPropertiesWrap;
+import ru.vkulakov.phonex.services.RangeService;
+import ru.vkulakov.phonex.utils.PhonexPropertiesWrap;
 import ru.vkulakov.phonex.utils.Setup;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,7 +44,9 @@ public class SearchResourceTest {
 
     @Test
     public void testSearchNormal() {
-        String expected = "{\"message\":\"\",\"phone\":{\"operator\":\"ООО \\\"Т2 Мобайл\\\"\",\"phone\":\"79515639692\",\"region\":\"Воронежская обл.\"},\"result\":0}";
+		new RangeService().load("code_9kh", "file:///" + System.getProperty("user.dir") + "/src/test/resources/RangeServiceTest.csv");
+
+		String expected = "{\"message\":\"\",\"phone\":{\"operator\":\"ООО \\\"Т2 Мобайл\\\"\",\"phone\":\"79515639692\",\"region\":\"Воронежская обл.\"},\"result\":0}";
         String actual = target.path("search/79515639692").request().get(String.class);
         assertEquals(expected, actual);
     }

@@ -1,5 +1,7 @@
 package ru.vkulakov.phonex.resources;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.vkulakov.phonex.model.Phone;
 import ru.vkulakov.phonex.model.Result;
 import ru.vkulakov.phonex.services.PhoneService;
@@ -10,8 +12,23 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+/**
+ * Ресурс для поиска информации по номеру телефона.
+ * Публикует ресурс по указанному пути и определяет методы для
+ * обработки соответствующих запросов.
+ */
 @Path("search/{phone}")
 public class SearchResource {
+	private final static Logger logger = LoggerFactory.getLogger(SearchResource.class);
+
+	/**
+	 * Поиск информации по номеру телефона.
+	 * Обрабатывает GET-запросы к ресурсу: проверяет входные параметры
+	 * на валидность, ищет номер телефона и возвращает ответ с информацией
+	 * по переданному номеру телефона.
+	 * @param phoneStr номер телефона.
+	 * @return Результат поиска информации по номеру телефона.
+	 */
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Result search(@PathParam("phone") String phoneStr) {
@@ -31,8 +48,7 @@ public class SearchResource {
 				return new Result(phone);
 			}
 		} catch (Exception e) {
-    		System.err.println("Ошибка поиска информации по номеру телефона");
-    		e.printStackTrace(System.err);
+			logger.error("Ошибка поиска информации по номеру телефона", e);
 
 			return new Result(Result.ERROR, "Внутренняя ошибка на сервере");
 		}

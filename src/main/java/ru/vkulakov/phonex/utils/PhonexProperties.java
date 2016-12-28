@@ -1,7 +1,6 @@
-package ru.vkulakov.phonex;
+package ru.vkulakov.phonex.utils;
 
-import oracle.jrockit.jfr.StringConstantPool;
-import ru.vkulakov.phonex.exceptions.PhonexException;
+import ru.vkulakov.phonex.exceptions.PropertiesException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * <h3>Получение параметров приложения</h3>
+ * Получение параметров приложения
  */
 public class PhonexProperties {
 	protected Properties properties;
@@ -36,8 +35,8 @@ public class PhonexProperties {
 	}
 
 	/**
-	 * <p>Получение значения параметра по его имени.</p>
-	 * <p>Если параметр не найден, то выбрасывается {@link PropertiesException}.</p>
+	 * Получение значения параметра по его имени.
+	 * Если параметр не найден, то выбрасывается {@link PropertiesException}.
 	 * @param name имя параметра.
 	 * @return Значение параметра.
 	 * @throws PropertiesException если параметр с указанным именем в настройках не найден.
@@ -51,14 +50,44 @@ public class PhonexProperties {
 	}
 
 	/**
-	 * <p>Получение значения параметра по его имени.</p>
-	 * <p>Если параметр не найден, то возвращается значение по-умолчанию.</p>
+	 * Получение значения параметра по его имени.
+	 * Если параметр не найден, то возвращается значение по-умолчанию.
 	 * @param name имя параметра.
 	 * @param defValue значение по-умолчанию для параметра.
 	 * @return Значение параметра или значение по-умолчанию.
 	 */
 	public String getProperty(String name, String defValue) {
 		return properties.getProperty(name, defValue);
+	}
+
+	/**
+	 * Получение целочисленного значения параметра по его имени.
+	 * Если параметр не найден, то выбрасывается {@link PropertiesException}.
+	 * @param name имя параметра.
+	 * @return Значение параметра.
+	 * @throws PropertiesException если параметр с указанным именем в настройках не найден.
+	 */
+	public int getIntProperty(String name) {
+		if(properties.containsKey(name)) {
+			return Integer.valueOf(properties.getProperty(name));
+		} else {
+			throw new PropertiesException("Параметр '" + name + "' не найден");
+		}
+	}
+
+	/**
+	 * Получение целочисленного значения параметра по его имени.
+	 * Если параметр не найден, то возвращается значение по-умолчанию.
+	 * @param name имя параметра.
+	 * @param defValue значение по-умолчанию для параметра.
+	 * @return Значение параметра или значение по-умолчанию.
+	 */
+	public int getIntProperty(String name, int defValue) {
+		if(properties.containsKey(name)) {
+			return Integer.valueOf(properties.getProperty(name));
+		} else {
+			return defValue;
+		}
 	}
 
 	/**
@@ -93,18 +122,5 @@ public class PhonexProperties {
 		}
 
 		return instance;
-	}
-
-	/**
-	 * <h3>Исключение при работе с параметрами приложения</h3>
-	 */
-	public static class PropertiesException extends PhonexException {
-		public PropertiesException(String message) {
-			super(message);
-		}
-
-		public PropertiesException(String message, Throwable cause) {
-			super(message, cause);
-		}
 	}
 }

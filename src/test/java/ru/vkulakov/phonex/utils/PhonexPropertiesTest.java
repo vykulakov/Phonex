@@ -1,14 +1,16 @@
-package ru.vkulakov.phonex;
+package ru.vkulakov.phonex.utils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import ru.vkulakov.phonex.exceptions.PropertiesException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * <h3>Тестирование получения параметров приложения</h3>
@@ -39,7 +41,7 @@ public class PhonexPropertiesTest {
 		assertEquals("Полученнное значение не соответствует ожидаемому", "Test string 0", PhonexProperties.getInstance().getProperty("prop.string"));
 	}
 
-	@Test(expected = PhonexProperties.PropertiesException.class)
+	@Test(expected = PropertiesException.class)
 	public void getPropertyNotExist() {
 		assertEquals("Полученнное значение не соответствует ожидаемому", "Test string 0", PhonexProperties.getInstance().getProperty("some.string"));
 	}
