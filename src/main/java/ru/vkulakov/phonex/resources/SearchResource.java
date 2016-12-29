@@ -41,7 +41,7 @@ public class SearchResource {
 		}
 
 		try {
-			Phone phone = new PhoneService().search(phoneStr);
+			Phone phone = new PhoneService().searchByPhone(phoneStr);
 			if(phone == null) {
 				return new Result(Result.NOT_FOUND, "Информация по номеру телефона не найдена");
 			} else {

@@ -124,21 +124,12 @@ public class Main {
 
 			latch.countDown();
 
-			try {
-				logger.debug("Ожидание перед завершением приложения");
-
-				Thread.sleep(5000);
-
-				logger.debug("Конец ожидания перед завершением приложения");
-			} catch (InterruptedException e) {
-				logger.error("Ожидание перед завершением приложения прервано", e);
-			}
+			// Пробуем дать возможность нормально завершиться основному потоку.
+			Thread.yield();
 		}));
 
 		try {
 			latch.await();
-
-			logger.debug("Завершение ожидания");
 		} catch (InterruptedException e) {
 			logger.error("Ожидание завершения приложения прервано", e);
 		}

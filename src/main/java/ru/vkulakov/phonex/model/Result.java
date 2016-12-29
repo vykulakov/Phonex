@@ -15,14 +15,27 @@ public class Result {
 	 * Значение не передано или передано пустое значение.
 	 */
 	public final static int EMPTY = 1;
+
 	/**
 	 * Значение имеет неправильный формат.
 	 */
 	public final static int BAD_FORMAT = 2;
+
 	/**
 	 * Результат по переданному значению не найден.
 	 */
 	public final static int NOT_FOUND = 3;
+
+	/**
+	 * Слишком короткое значение.
+	 */
+	public final static int TOO_SHORT = 4;
+
+	/**
+	 * Найдено слишком много результатов по переданному значению.
+	 */
+	public final static int TOO_MANY = 5;
+
 	/**
 	 * Внутрення ошибка.
 	 */

@@ -40,7 +40,7 @@ public class RangeService {
 	 */
 	public void load(String table, String url) {
 		try (
-			Connection conn = Setup.getConnection()
+			Connection conn = Setup.getConnection();
 		) {
 			RangeDao rangeDao = new RangeDao(conn);
 
@@ -71,7 +71,6 @@ public class RangeService {
 				rangeDao.insert(table, range);
 
 				if(++i % 5000 == 0) {
-					logger.debug("Commit [i={}, table={}]", i, table);
 					conn.commit();
 				}
 			}
