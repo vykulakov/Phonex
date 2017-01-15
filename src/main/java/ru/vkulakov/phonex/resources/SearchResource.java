@@ -59,7 +59,7 @@ public class SearchResource {
 		}
 
 		try {
-			Phone phone = new PhoneService().searchByPhone(phoneStr);
+			Phone phone = createPhoneService().searchByPhone(phoneStr);
 			if(phone == null) {
 				return new Result(Result.NOT_FOUND, "Информация по номеру телефона не найдена");
 			} else {
@@ -71,4 +71,12 @@ public class SearchResource {
 			return new Result(Result.ERROR, "Внутренняя ошибка на сервере");
 		}
     }
+
+	/**
+	 * Фабричный метод для создания экземпляра сервиса для работы с номерами телефонов.
+	 * @return Экземпляр сервиса для работы с номерами телефонов.
+	 */
+	protected PhoneService createPhoneService() {
+		return new PhoneService();
+	}
 }

@@ -30,9 +30,9 @@ CLASSPATH="$LIBDIR/*"
 
 cd "$BASEDIR"
 if [ ! -z "$PHONEX_LOG" ]; then
-        "$JAVA_HOME"/bin/java $JAVA_OPTS -cp "$CLASSPATH" ru.joxnet.phonex.Main >> ${PHONEX_LOG} 2>&1 &
+        "$JAVA_HOME"/bin/java $JAVA_OPTS -cp "$CLASSPATH" ru.vkulakov.phonex.Main >> ${PHONEX_LOG} 2>&1 &
 else
-        "$JAVA_HOME"/bin/java $JAVA_OPTS -cp "$CLASSPATH" ru.joxnet.phonex.Main
+        "$JAVA_HOME"/bin/java $JAVA_OPTS -cp "$CLASSPATH" ru.vkulakov.phonex.Main
 fi
 
 if [ ! -z "$PHONEX_PID" ]; then

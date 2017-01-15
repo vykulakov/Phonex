@@ -65,7 +65,7 @@ public class PrefixResource {
 		}
 
 		try {
-			List<Phone> phones = new PhoneService().searchByPrefix(prefixStr);
+			List<Phone> phones = createPhoneService().searchByPrefix(prefixStr);
 
 			if(phones.size() == 0) {
 				return new Result(Result.NOT_FOUND, "Информация по префиксу номера телефона не найдена");
@@ -84,4 +84,12 @@ public class PrefixResource {
 			return new Result(Result.ERROR, "Внутренняя ошибка на сервере");
 		}
     }
+
+	/**
+	 * Фабричный метод для создания экземпляра сервиса для работы с номерами телефонов.
+	 * @return Экземпляр сервиса для работы с номерами телефонов.
+	 */
+    protected PhoneService createPhoneService() {
+    	return new PhoneService();
+	}
 }

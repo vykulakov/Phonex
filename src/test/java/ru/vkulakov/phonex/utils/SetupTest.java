@@ -21,6 +21,11 @@ package ru.vkulakov.phonex.utils;
 import org.junit.After;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
@@ -36,25 +41,27 @@ public class SetupTest {
 	}
 
 	@Test
-	public void getConnection() {
+	public void initDatabase() throws SQLException, IOException {
 		Properties properties = new Properties();
 		properties.setProperty("db.driver", "org.sqlite.JDBC");
 		properties.setProperty("db.url", "jdbc:sqlite:data/phonex.test.db");
+		properties.setProperty("prefix.8", "table8");
+		properties.setProperty("prefix.9", "table9");
 
 		PhonexProperties.getInstance(properties);
 
-		assertNotNull(Setup.getConnection());
-	}
+		try (
+			Connection conn = Setup.getConnection()
+		) {
+			assertNotNull(conn);
 
-	@Test
-	public void initDatabase() {
-		Properties properties = new Properties();
-		properties.setProperty("db.driver", "org.sqlite.JDBC");
-		properties.setProperty("db.url", "jdbc:sqlite:data/phonex.test.db");
+			Setup.initDatabase(conn);
 
-		PhonexProperties.getInstance(properties);
-
-		Setup.initDatabase(Setup.getConnection());
+			conn.createStatement().execute("SELECT code, start, finish, capacity, operator, region FROM table8");
+			conn.createStatement().execute("SELECT code, start, finish, capacity, operator, region FROM table9");
+		} finally {
+			Files.delete(Paths.get(System.getProperty("user.dir"), "data/phonex.test.db"));
+		}
 	}
 
 	@Test

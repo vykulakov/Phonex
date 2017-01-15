@@ -18,25 +18,43 @@
 
 package ru.vkulakov.phonex.services;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.vkulakov.phonex.Main;
-import ru.vkulakov.phonex.utils.PhonexPropertiesWrap;
+import ru.vkulakov.phonex.dao.RangeDao;
+import ru.vkulakov.phonex.model.Range;
+
+import java.sql.Connection;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public class RangeServiceTest {
+	private RangeDao rangeDao;
+	private RangeService rangeService;
+
 	@Before
 	public void setUp() {
-		Main.init();
-	}
+		rangeDao = mock(RangeDao.class);
 
-	@After
-	public void tearDown() {
-		PhonexPropertiesWrap.recycle();
+		rangeService = new RangeService() {
+			@Override
+			protected Connection createConnection() {
+				return mock(Connection.class);
+			}
+
+			@Override
+			protected RangeDao createRangeDao(Connection conn) {
+				return rangeDao;
+			}
+		};
 	}
 
 	@Test
 	public void load() {
-		new RangeService().load("code_9kh", "file:///" + System.getProperty("user.dir") + "/src/test/resources/RangeServiceTest.csv");
+		rangeService.load("table", "file:///" + System.getProperty("user.dir") + "/src/test/resources/RangeServiceTest.csv");
+
+		verify(rangeDao, times(1)).truncate(eq("table"));
+		verify(rangeDao, times(58)).insert(eq("table"), any(Range.class));
 	}
 }

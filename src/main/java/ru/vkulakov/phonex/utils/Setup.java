@@ -25,7 +25,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
+import java.util.Collection;
 
 /**
  * Класс для получения доступа к ресурсам приложения
@@ -60,8 +60,8 @@ public class Setup {
 		try {
 			Statement stmt = conn.createStatement();
 
-			Map<String, String> codes = PhonexProperties.getInstance().getPropertyByPrefix("rossvyaz.");
-			for(String table : codes.keySet()) {
+			Collection<String> tables = PhonexProperties.getInstance().getPropertyByPrefix("prefix.").values();
+			for(String table : tables) {
 				stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + table + " (code INTEGER, start INTEGER, finish INTEGER, capacity INTEGER, operator STRING, region STRING)");
 			}
 		} catch (SQLException e) {

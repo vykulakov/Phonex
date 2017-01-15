@@ -39,9 +39,9 @@ public class PhoneService {
 	 */
 	public Phone searchByPhone(String phoneStr) {
 		try (
-			Connection conn = Setup.getConnection()
+			Connection conn = createConnection()
 		) {
-			return new PhoneDao(conn).getByPhone(phoneStr);
+			return createPhoneDao(conn).getByPhone(phoneStr);
 		} catch (SQLException e) {
 			throw new PhonexException("Ошибка поиска информации по номеру телефона", e);
 		}
@@ -54,14 +54,14 @@ public class PhoneService {
 	 */
 	public List<Phone> searchByPrefix(String prefixStr) {
 		try (
-			Connection conn = Setup.getConnection();
+			Connection conn = createConnection();
 		) {
 			if(prefixStr.matches("^7\\d{1,3}$")) {
 				String code = prefixStr.substring(1);
 				int codeStart = Integer.valueOf(code + "000".substring(code.length()));
 				int codeFinish = Integer.valueOf(code + "999".substring(code.length()));
 
-				return new PhoneDao(conn).listByCodeRange(2, codeStart, codeFinish);
+				return createPhoneDao(conn).listByCodeRange(2, codeStart, codeFinish);
 			}
 			if(prefixStr.matches("^7\\d{4,10}$")) {
 				int code = Integer.valueOf(prefixStr.substring(1, 4));
@@ -70,12 +70,29 @@ public class PhoneService {
 				int numberStart = Integer.valueOf(number + "0000000".substring(number.length()));
 				int numberFinish = Integer.valueOf(number + "9999999".substring(number.length()));
 
-				return new PhoneDao(conn).listByNumberRange(2, code, numberStart, numberFinish);
+				return createPhoneDao(conn).listByNumberRange(2, code, numberStart, numberFinish);
 			}
 		} catch (SQLException e) {
 			throw new PhonexException("Ошибка поиска информации по префиксу номера телефона", e);
 		}
 
 		return Collections.emptyList();
+	}
+
+	/**
+	 * Фабричный метод для создания подключения к базе данных.
+	 * @return Подключение к базе данных.
+	 */
+	protected Connection createConnection() {
+		return Setup.getConnection();
+	}
+
+	/**
+	 * Фабричный метод для создания дао для номеров телефонов.
+	 * @param conn подключение к базе данных.
+	 * @return Дао для номеров телефонов.
+	 */
+	protected PhoneDao createPhoneDao(Connection conn) {
+		return new PhoneDao(conn);
 	}
 }

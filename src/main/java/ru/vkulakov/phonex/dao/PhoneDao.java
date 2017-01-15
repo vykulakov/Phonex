@@ -20,26 +20,21 @@ package ru.vkulakov.phonex.dao;
 
 import ru.vkulakov.phonex.exceptions.PhonexException;
 import ru.vkulakov.phonex.model.Phone;
+import ru.vkulakov.phonex.utils.PhonexProperties;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * ДАО для работы с номерами телефонов.
  */
 public class PhoneDao {
 	private Connection conn;
-
-	private final static Map<String, String> tables = new HashMap<String, String>();
-	static {
-		tables.put("3", "code_3kh");
-		tables.put("4", "code_4kh");
-		tables.put("8", "code_8kh");
-		tables.put("9", "code_9kh");
-	}
 
 	public PhoneDao(Connection conn) {
 		this.conn = conn;
@@ -50,8 +45,8 @@ public class PhoneDao {
 			return null;
 		}
 
-		String p = phoneStr.substring(1, 2);
-		String table = tables.getOrDefault(p, null);
+		String prefix = phoneStr.substring(1, 2);
+		String table = PhonexProperties.getInstance().getProperty("prefix." + prefix, null);
 		if(table == null) {
 			return null;
 		}
@@ -98,8 +93,8 @@ public class PhoneDao {
 	 * @return Список номеров телефонов.
 	 */
 	public List<Phone> listByCodeRange(int limit, int codeStart, int codeFinish) {
-		String p = ("" + codeStart).substring(0, 1);
-		String table = tables.getOrDefault(p, null);
+		String prefix = ("" + codeStart).substring(0, 1);
+		String table = PhonexProperties.getInstance().getProperty("prefix." + prefix, null);
 		if(table == null) {
 			return Collections.emptyList();
 		}
@@ -151,8 +146,8 @@ public class PhoneDao {
 	 * @return Список номеров телефонов.
 	 */
 	public List<Phone> listByNumberRange(int limit, int code, int numberStart, int numberFinish) {
-		String p = ("" + code).substring(0, 1);
-		String table = tables.getOrDefault(p, null);
+		String prefix = ("" + code).substring(0, 1);
+		String table = PhonexProperties.getInstance().getProperty("prefix." + prefix, null);
 		if(table == null) {
 			return Collections.emptyList();
 		}

@@ -47,6 +47,6 @@ public class PhonexPropertiesRealTest {
 
 	@Test
 	public void getProperty() throws Exception {
-		assertTrue("Полученнное значение не соответствует ожидаемому", Arrays.asList("test", "develop").contains(PhonexProperties.getInstance().getProperty("profile")));
+		assertTrue("Полученнное значение не соответствует ожидаемому", Arrays.asList("test", "devel").contains(PhonexProperties.getInstance().getProperty("profile")));
 	}
 }

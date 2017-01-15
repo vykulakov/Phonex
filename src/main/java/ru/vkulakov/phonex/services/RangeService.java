@@ -58,9 +58,9 @@ public class RangeService {
 	 */
 	public void load(String table, String url) {
 		try (
-			Connection conn = Setup.getConnection();
+			Connection conn = createConnection();
 		) {
-			RangeDao rangeDao = new RangeDao(conn);
+			RangeDao rangeDao = createRangeDao(conn);
 
 			// Сначала удаляем все записи.
 			rangeDao.truncate(table);
@@ -104,5 +104,22 @@ public class RangeService {
 		} catch (IOException e) {
 			throw new PhonexException("Ошибка чтения диапазонов номеров телефонов", e);
 		}
+	}
+
+	/**
+	 * Фабричный метод для создания подключения к базе данных.
+	 * @return Подключение к базе данных.
+	 */
+	protected Connection createConnection() {
+		return Setup.getConnection();
+	}
+
+	/**
+	 * Фабричный метод для создания дао для диапазонов.
+	 * @param conn подключение к базе данных.
+	 * @return Дао для диапазонов.
+	 */
+	protected RangeDao createRangeDao(Connection conn) {
+		return new RangeDao(conn);
 	}
 }

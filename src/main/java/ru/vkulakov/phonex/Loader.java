@@ -35,7 +35,7 @@ public class Loader implements Runnable {
 	public void run() {
 		logger.debug("Запуск загрузчика номеров телефонов");
 
-		RangeService rangeService = new RangeService();
+		RangeService rangeService = createRangeService();
 		try {
 			Map<String, String> codes = PhonexProperties.getInstance().getPropertyByPrefix("rossvyaz.");
 			for(Map.Entry<String, String> code : codes.entrySet()) {
@@ -51,5 +51,9 @@ public class Loader implements Runnable {
 		}
 
 		logger.debug("Завершение загрузчика номеров телефонов");
+	}
+
+	protected RangeService createRangeService() {
+		return new RangeService();
 	}
 }
