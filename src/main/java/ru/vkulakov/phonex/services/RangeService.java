@@ -58,7 +58,7 @@ public class RangeService {
 	 */
 	public void load(String table, String url) {
 		try (
-			Connection conn = createConnection();
+			Connection conn = createConnection()
 		) {
 			RangeDao rangeDao = createRangeDao(conn);
 

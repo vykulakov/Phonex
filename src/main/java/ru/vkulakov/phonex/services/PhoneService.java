@@ -54,7 +54,7 @@ public class PhoneService {
 	 */
 	public List<Phone> searchByPrefix(String prefixStr) {
 		try (
-			Connection conn = createConnection();
+			Connection conn = createConnection()
 		) {
 			if(prefixStr.matches("^7\\d{1,3}$")) {
 				String code = prefixStr.substring(1);

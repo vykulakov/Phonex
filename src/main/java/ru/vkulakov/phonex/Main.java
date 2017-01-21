@@ -92,7 +92,7 @@ public class Main {
     }
 
 	/**
-	 * Инициализация планировщика и запуск задачи переодического обновления базы номеров телефонов.
+	 * Инициализация планировщика и запуск задачи периодического обновления базы номеров телефонов.
 	 */
 	private static void startLoader() {
 		logger.debug("Запуск загрузчика");
@@ -126,7 +126,7 @@ public class Main {
      * Главный метод для запуска приложения.
      * @param args аргументы командной строки.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
     	init();
         startServer();
         startLoader();
@@ -146,11 +146,7 @@ public class Main {
 			Thread.yield();
 		}));
 
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			logger.error("Ожидание завершения приложения прервано", e);
-		}
+		latch.await();
 
 		logger.debug("Завершение приложения");
     }

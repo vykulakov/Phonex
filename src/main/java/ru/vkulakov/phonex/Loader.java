@@ -26,7 +26,7 @@ import ru.vkulakov.phonex.utils.PhonexProperties;
 import java.util.Map;
 
 /**
- * Загрузка информации о номерах телефонах.
+ * Загрузка диапазонов номеров телефонов.
  */
 public class Loader implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(Loader.class);
@@ -53,6 +53,10 @@ public class Loader implements Runnable {
 		logger.debug("Завершение загрузчика номеров телефонов");
 	}
 
+	/**
+	 * Фабричный метод для создания сервиса для работы с диапазонами номеров телефонов.
+	 * @return Сервис для работы с диапазонами номеров телефонов.
+	 */
 	protected RangeService createRangeService() {
 		return new RangeService();
 	}

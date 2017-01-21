@@ -67,7 +67,7 @@ public class PhoneDao {
 				"     c.code = ? AND" +
 				"     c.start <= ? AND ? <= c.finish;";
 		try (
-			PreparedStatement ps = conn.prepareStatement(query);
+			PreparedStatement ps = conn.prepareStatement(query)
 		) {
 			int index = 1;
 			ps.setInt(index++, code);
